@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TestNode_encodedSize(t *testing.T) {
@@ -56,6 +57,58 @@ func TestNode_encode_decode(t *testing.T) {
 			key:     []byte("key"),
 			value:   []byte("value"),
 		}, "000206036b65790576616c7565", false},
+	}
+	for name, tc := range testcases {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := tc.node.writeBytes(&buf)
+			if tc.expectError {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tc.expectHex, hex.EncodeToString(buf.Bytes()))
+
+			node, err := MakeNode(buf.Bytes())
+			require.NoError(t, err)
+			// since key and value is always decoded to []byte{} we augment the expected struct here
+			if tc.node.key == nil {
+				tc.node.key = []byte{}
+			}
+			if tc.node.value == nil && tc.node.height == 0 {
+				tc.node.value = []byte{}
+			}
+			require.Equal(t, tc.node, node)
+		})
+	}
+}
+
+func TestNode_encode_decode_bson(t *testing.T) {
+	var bsonval = bson.D{{"custom", "value-3"}}
+	bsonbytes, _ := bson.Marshal(bsonval)
+	testcases := map[string]struct {
+		node        *Node
+		expectHex   string
+		expectError bool
+	}{
+		"nil":   {nil, "", true},
+		"empty": {&Node{}, "0000000000", false},
+		"inner": {&Node{
+			height:    3,
+			version:   2,
+			size:      7,
+			key:       []byte("key"),
+			leftHash:  []byte{0x70, 0x80, 0x90, 0xa0},
+			rightHash: []byte{0x10, 0x20, 0x30, 0x40},
+		}, "060e04036b657904708090a00410203040", false},
+		"leaf": {&Node{
+			height:  0,
+			version: 3,
+			size:    1,
+			key:     []byte("key"),
+			value:   bsonbytes,
+		}, "6500000002637573746f6d000800000076616c75652d3300106e6f64655f6865696768740000000000126e6f64655f73697a65000100000000000000126e6f64655f76657273696f6e000300000000000000056e6f64655f6b65790003000000006b657900", false},
 	}
 	for name, tc := range testcases {
 		tc := tc
