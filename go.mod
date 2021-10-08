@@ -11,10 +11,10 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/tendermint v0.34.10
+	github.com/tendermint/tendermint v0.34.13
 	github.com/tendermint/tm-db v0.6.4
 	go.mongodb.org/mongo-driver v1.6.0
 	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9
 	google.golang.org/genproto v0.0.0-20201119123407-9b1e624d6bc4
-	google.golang.org/grpc v1.39.0
+	google.golang.org/grpc v1.41.0
 )

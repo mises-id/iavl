@@ -3,7 +3,22 @@
 
 ## Unreleased
 
+## 0.17.1 (September 15, 2021)
 
+### Bug Fixes
+
++ [\#432](https://github.com/cosmos/iavl/pull/432) Fix race condition related to Cosmos SDK and nodeDB usage.
+
+## 0.17.0 (August 31, 2021)
+
+### Improvements
+
+- Various performance improvements. Credits: Orijtech.
+- Updating dependencies
+
+### CLI Breaking Changes
+
+- [\#396](https://github.com/cosmos/iavl/pull/396) Add "prefix" arg to iaviewer.
 
 ## 0.16.0 (May 04, 2021)
 
