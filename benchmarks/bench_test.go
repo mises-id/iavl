@@ -11,6 +11,7 @@ import (
 
 	"github.com/cosmos/iavl"
 	db "github.com/tendermint/tm-db"
+	_ "github.com/tendermint/tm-db/metadb"
 )
 
 const historySize = 20
@@ -175,6 +176,7 @@ func BenchmarkMedium(b *testing.B) {
 	benchmarks := []benchmark{
 		{"memdb", 100000, 100, 16, 40},
 		{"goleveldb", 100000, 100, 16, 40},
+		{"mongodb", 100000, 100, 16, 40},
 		// FIXME: this crashes on init! Either remove support, or make it work.
 		// {"cleveldb", 100000, 100, 16, 40},
 	}
@@ -185,6 +187,8 @@ func BenchmarkSmall(b *testing.B) {
 	benchmarks := []benchmark{
 		{"memdb", 1000, 100, 4, 10},
 		{"goleveldb", 1000, 100, 4, 10},
+		{"mongodb", 1000, 100, 4, 10},
+
 		// FIXME: this crashes on init! Either remove support, or make it work.
 		// {"cleveldb", 100000, 100, 16, 40},
 	}
@@ -195,6 +199,7 @@ func BenchmarkLarge(b *testing.B) {
 	benchmarks := []benchmark{
 		{"memdb", 1000000, 100, 16, 40},
 		{"goleveldb", 1000000, 100, 16, 40},
+		{"mongodb", 1000000, 100, 16, 40},
 		// FIXME: this crashes on init! Either remove support, or make it work.
 		// {"cleveldb", 100000, 100, 16, 40},
 	}

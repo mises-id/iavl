@@ -20,3 +20,5 @@ require (
 	google.golang.org/grpc v1.42.0
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 )
+
+replace github.com/tendermint/tm-db => github.com/mises-id/tm-db v0.6.5-0.20220705054959-78edf1c4e9d3
