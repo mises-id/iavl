@@ -119,8 +119,10 @@ func (i *Importer) Add(exportNode *ExportNode) error {
 		return err
 	}
 
+	isTrackable := i.tree.ndb.db.IsTrackable()
+
 	var buf bytes.Buffer
-	err = node.writeBytes(&buf)
+	err = node.writeBytesEx(&buf, isTrackable)
 	if err != nil {
 		return err
 	}

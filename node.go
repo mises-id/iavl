@@ -61,12 +61,16 @@ func MakeNode(buf []byte) (*Node, error) {
 				node.version = ele.Value.(int64)
 			case "node_key":
 				node.key = ele.Value.(primitive.Binary).Data
+			case "node_value":
+				node.value = ele.Value.(primitive.Binary).Data
 			default:
 				bsonval = append(bsonval, ele)
 			}
 		}
-		bsonvalbytes, _ := bson.Marshal(bsonval)
-		node.value = cp(bsonvalbytes)
+		if node.value == nil {
+			bsonvalbytes, _ := bson.Marshal(bsonval)
+			node.value = cp(bsonvalbytes)
+		}
 
 		return node, nil
 	}
@@ -378,17 +382,21 @@ func (node *Node) writeHashBytesRecursively(w io.Writer) (hashCount int64, err e
 }
 
 func (node *Node) encodedSize() int {
-	if node.isLeaf() {
+	return node.encodedSizeEx(false)
+}
+func (node *Node) encodedSizeEx(isTrackable bool) int {
+	if node.isLeaf() && isTrackable {
 		var bsonval bson.D
 		err := bson.Unmarshal(node.value, &bsonval)
-		if err == nil {
-			bsonval = append(bsonval, bson.E{"node_height", node.height})
-			bsonval = append(bsonval, bson.E{"node_size", node.size})
-			bsonval = append(bsonval, bson.E{"node_version", node.version})
-			bsonval = append(bsonval, bson.E{"node_key", node.key})
-			bsonbytes, _ := bson.Marshal(bsonval)
-			return len(bsonbytes)
+		if err != nil {
+			bsonval = bson.D{{"node_value", node.value}}
 		}
+		bsonval = append(bsonval, bson.E{"node_height", node.height})
+		bsonval = append(bsonval, bson.E{"node_size", node.size})
+		bsonval = append(bsonval, bson.E{"node_version", node.version})
+		bsonval = append(bsonval, bson.E{"node_key", node.key})
+		bsonbytes, _ := bson.Marshal(bsonval)
+		return len(bsonbytes)
 	}
 	n := 1 +
 		encodeVarintSize(node.size) +
@@ -403,27 +411,32 @@ func (node *Node) encodedSize() int {
 	return n
 }
 
-// Writes the node as a serialized byte slice to the supplied io.Writer.
 func (node *Node) writeBytes(w io.Writer) error {
+	return node.writeBytesEx(w, false)
+}
+
+// Writes the node as a serialized byte slice to the supplied io.Writer.
+func (node *Node) writeBytesEx(w io.Writer, isTrackable bool) error {
 	if node == nil {
 		return errors.New("cannot write nil node")
 	}
 
-	if node.isLeaf() {
+	if node.isLeaf() && isTrackable {
 		var bsonval bson.D
 		err := bson.Unmarshal(node.value, &bsonval)
-		if err == nil {
-			bsonval = append(bsonval, bson.E{"node_height", node.height})
-			bsonval = append(bsonval, bson.E{"node_size", node.size})
-			bsonval = append(bsonval, bson.E{"node_version", node.version})
-			bsonval = append(bsonval, bson.E{"node_key", node.key})
-			bsonbytes, cause := bson.Marshal(bsonval)
-			if cause != nil {
-				return errors.Wrap(cause, "writing bson")
-			}
-			_, err := w.Write(bsonbytes)
-			return err
+		if err != nil {
+			bsonval = bson.D{{"node_value", node.value}}
 		}
+		bsonval = append(bsonval, bson.E{"node_height", node.height})
+		bsonval = append(bsonval, bson.E{"node_size", node.size})
+		bsonval = append(bsonval, bson.E{"node_version", node.version})
+		bsonval = append(bsonval, bson.E{"node_key", node.key})
+		bsonbytes, cause := bson.Marshal(bsonval)
+		if cause != nil {
+			return errors.Wrap(cause, "writing bson")
+		}
+		_, err = w.Write(bsonbytes)
+		return err
 	}
 
 	cause := encodeVarint(w, int64(node.height))

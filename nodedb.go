@@ -116,10 +116,11 @@ func (ndb *nodeDB) SaveNode(node *Node) {
 	}
 
 	// Save node bytes to db.
+	isTrackable := ndb.db.IsTrackable()
 	var buf bytes.Buffer
-	buf.Grow(node.encodedSize())
+	buf.Grow(node.encodedSizeEx(isTrackable))
 
-	if err := node.writeBytes(&buf); err != nil {
+	if err := node.writeBytesEx(&buf, isTrackable); err != nil {
 		panic(err)
 	}
 
