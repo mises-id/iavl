@@ -5,9 +5,9 @@ import (
 	"errors"
 	"sort"
 
-	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/iavl/fastnode"
 	ibytes "github.com/cosmos/iavl/internal/bytes"
+	dbm "github.com/tendermint/tm-db"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	db "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
+	db "github.com/tendermint/tm-db"
 )
 
 func TestProofOp(t *testing.T) {

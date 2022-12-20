@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/confio/ics23/go v0.9.0
-	github.com/cosmos/cosmos-db v0.0.0-20220822060143-23a8145386c0
+	github.com/tendermint/tm-db v0.0.0-20220822060143-23a8145386c0
 	github.com/golang/mock v1.6.0
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/stretchr/testify v1.8.1
@@ -206,4 +206,4 @@ require (
 
 retract v0.18.0
 
-replace github.com/cosmos/cosmos-db => ../cosmos-db
+replace github.com/tendermint/tm-db => github.com/mises-id/tm-db v0.6.5-0.20221220153440-b50cc03f5327
