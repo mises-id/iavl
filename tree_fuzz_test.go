@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	cmn "github.com/cosmos/iavl/common"
+	iavlrand "github.com/cosmos/iavl/internal/rand"
 )
 
 // This file implement fuzz testing by generating programs and then running
@@ -86,7 +86,7 @@ func genRandomProgram(size int) *program {
 	nextVersion := 1
 
 	for p.size() < size {
-		k, v := []byte(cmn.RandStr(1)), []byte(cmn.RandStr(1))
+		k, v := []byte(iavlrand.RandStr(1)), []byte(iavlrand.RandStr(1))
 
 		switch rand.Int() % 7 {
 		case 0, 1, 2:
@@ -118,7 +118,9 @@ func TestMutableTreeFuzz(t *testing.T) {
 			program := genRandomProgram(size)
 			err = program.Execute(tree)
 			if err != nil {
-				t.Fatalf("Error after %d iterations (size %d): %s\n%s", iterations, size, err.Error(), tree.String())
+				str, err := tree.String()
+				require.Nil(t, err)
+				t.Fatalf("Error after %d iterations (size %d): %s\n%s", iterations, size, err.Error(), str)
 			}
 			iterations++
 		}
